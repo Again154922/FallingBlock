@@ -2,36 +2,28 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float speed = 9;
-    private float limitX = 7.2F;
-    [SerializeField] private Transform playerTransform;
-    
-    // Start is called before the first frame update
-    void Awake()
-    {
-        Debug.Log(speed);
-        Debug.Log(limitX);
-    }
+    [SerializeField] private float speed = 15;
+    [SerializeField] private float limitX = 7.2F;
 
     // Update is called once per frame
     void Update()
     {
         Direction? direction = GetDirection();
         if (direction is null) return;
-        float targetX = playerTransform.position.x + (float)direction * speed * Time.deltaTime;
+        float targetX = transform.position.x + (float)direction * speed * Time.deltaTime;
 
         if (targetX < -limitX)
         {
-            playerTransform.position = new Vector3(-limitX, -4.5F, 0);
+            transform.position = new Vector3(-limitX, -4.5F, 0);
             return;
         }
         if (targetX > limitX)
         {
-            playerTransform.position = new Vector3(limitX, -4.5F, 0);
+            transform.position = new Vector3(limitX, -4.5F, 0);
             return;
         }
         
-        playerTransform.position = new Vector3(targetX, -4.5F, 0);
+        transform.position = new Vector3(targetX, -4.5F, 0);
     }
 
     Direction? GetDirection()
@@ -40,11 +32,21 @@ public class PlayerController : MonoBehaviour
         {
             return Direction.Left;
         }
+
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
             return Direction.Right;
         }
+
         return null;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.TryGetComponent<Faller>(out _)) return;
+        
+        Destroy(other.gameObject);
+        GameManager.Instance.OnCatch();
     }
 }
 
