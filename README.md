@@ -42,7 +42,7 @@
 ```
 SampleScene
 ├── Main Camera             Camera（正交，Size 6，Position (0,0,-10)）
-├── Background              SpriteRenderer（bg.png，Scale (22,12,1)，Order in Layer -10）
+├── Background              SpriteRenderer（可选，bg.png，Scale (26,16,1)，Order in Layer -10）
 ├── Player                  SpriteRenderer + BoxCollider2D(Is Trigger) + PlayerController
 ├── Spawner                 Spawner 脚本（空对象，Position (0,0,0)）
 ├── Game                    AudioSource + GameManager
@@ -62,7 +62,7 @@ SampleScene
 | 对象 | 组件 | 关键设置 |
 | --- | --- | --- |
 | Main Camera | Camera | `Orthographic`、`Size = 6`、Position `(0,0,-10)` |
-| Background | SpriteRenderer | `bg.png`、`Order in Layer = -10`、Scale `(22,12,1)` |
+| Background（可选） | SpriteRenderer | `bg.png`、`Order in Layer = -10`、Scale `(26,16,1)`；**纯色背景可以完全不要这个对象**，见下方说明 |
 | Player | SpriteRenderer | `player.png` |
 | | Box Collider 2D | **`Is Trigger` 勾上**、Size `(1,0.25)` 左右（按图片比例调） |
 | | PlayerController | speed 9、limitX 7.2 |
@@ -115,13 +115,32 @@ RestartButton.onClick              ──► GameManager.StartGame()
 
 | 文件 | 尺寸 | 用途 | 建议 Scale |
 | --- | --- | --- | --- |
-| `bg.png` | 256×256 | 背景（深蓝灰） | `(22, 12, 1)` |
+| `bg.png` | 256×256 | 背景（竖直渐变，顶部 `#232A3F` → 底部 `#3C4764`） | `(26, 16, 1)` —— 可视范围约 21.3×12，这里故意放大一圈 |
 | `player.png` | 512×128 | 挡板（青色，带顶部高光） | `(1, 1, 1)`（PPU 256 时约 2×0.5 单位） |
 | `faller.png` | 256×256 | 普通掉落物（暖橙） | `(0.7, 0.7, 1)` |
 | `faller_gold.png` | 256×256 | **扩展**：金色道具（+3 分） | `(0.7, 0.7, 1)` |
 | `faller_bomb.png` | 256×256 | **扩展**：炸弹（扣 1 条命） | `(0.7, 0.7, 1)` |
 
 全部为 PNG 透明背景、圆角矩形；玩家和掉落物带一条顶部高光。
+
+> **背景为什么要"放大一圈"**：摄像机 `Orthographic Size = 6` 时，可视高度正好是 `6 × 2 = 12`，宽度 = `12 × 屏幕宽高比`（16:9 时约 21.3）。如果背景正好做成 22×12，**高度和可视范围完全相等**，一旦出现像素对齐误差、或者换了个比例更宽的窗口，边缘就会露出摄像机的 Clear Color（看起来像"白边"）。把背景放大到摄像机的 1.2~1.3 倍，就永远盖得住。
+>
+> 另外建议把摄像机的 `Clear Flags` 设成 `Solid Color`，背景色填成 `#2B3245`（和背景图一致）——双保险，即使哪天背景图没覆盖住，露出来的也是同色。
+
+### 要不要用背景图？
+
+**纯色背景不需要 `Background` 对象，也不需要 `bg.png`。** 直接把 `Main Camera` 的 `Clear Flags` 设成 `Solid Color`、`Background` 填一个深色，就是最省事的背景：零对象、零绘制开销。
+
+只有在这些情况下才值得用一张背景图：
+
+| 需求 | 例子 |
+| --- | --- |
+| 渐变 / 纹理 / 图案 | 本项目的 `bg.png`（竖直渐变） |
+| 背景要动 | 滚动星空、闪烁 |
+| 需要独立排序 | 背景要盖住某些场景物体 |
+| 多摄像机分层 | 背景只属于某一层 |
+
+现在的 `bg.png` 是 256×256 的**竖直渐变**（顶部 `#232A3F` → 底部 `#3C4764`）。如果你想要纯色，删掉 `Background` 对象和这张图就行；想留一点氛围感就保留。
 
 ## 8. 需要达到的效果
 
