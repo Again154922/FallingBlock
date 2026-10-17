@@ -11,7 +11,7 @@ public class Spawner : MonoBehaviour
 
     [Header("生成位置")]
     [SerializeField] private float spawnY = 6.5F;
-    [SerializeField] private float rangeX = 7.2F;
+    [SerializeField] private float edgePadding = 0.5F;   // 方块离屏幕边缘的余量
 
     [Header("下落速度")]
     [SerializeField] private float startGravity = 0.7F;
@@ -19,6 +19,14 @@ public class Spawner : MonoBehaviour
 
     private float elapsed;
     private float timer;
+    private Camera _cam;
+    private float _fallerHalfWidth;
+
+    void Awake()
+    {
+        _cam = Camera.main;
+        _fallerHalfWidth = fallerPrefab.transform.localScale.x * 0.5F;
+    }
     
     public void OnRestart()
     {
@@ -43,6 +51,10 @@ public class Spawner : MonoBehaviour
 
     void Spawn(float difficulty)
     {
+        // 生成范围跟着窗口宽度走，窗口再窄也不会把方块丢到画面外
+        float halfViewWidth = _cam.orthographicSize * _cam.aspect;
+        float rangeX = Mathf.Max(0.5F, halfViewWidth - _fallerHalfWidth - edgePadding);
+
         Vector3 position = new Vector3(Random.Range(-rangeX, rangeX), spawnY, 0);
         GameObject faller = Instantiate(fallerPrefab, position, Quaternion.identity, transform);
         

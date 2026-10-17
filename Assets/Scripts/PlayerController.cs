@@ -3,27 +3,38 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float speed = 15;
-    [SerializeField] private float limitX = 7.2F;
+    [SerializeField] private float edgePadding = 0.2F;   // 离屏幕边缘留的余量
+
+    private Camera _cam;
+    private float _halfWidth;
+
+    void Awake()
+    {
+        _cam = Camera.main;
+        _halfWidth = transform.localScale.x * 0.5F;
+    }
 
     // Update is called once per frame
     void Update()
     {
         Direction? direction = GetDirection();
         if (direction is null) return;
-        float targetX = transform.position.x + (float)direction * speed * Time.deltaTime;
 
-        if (targetX < -limitX)
-        {
-            transform.position = new Vector3(-limitX, -4.5F, 0);
-            return;
-        }
-        if (targetX > limitX)
-        {
-            transform.position = new Vector3(limitX, -4.5F, 0);
-            return;
-        }
-        
-        transform.position = new Vector3(targetX, -4.5F, 0);
+        float limitX = CurrentLimitX();
+        float targetX = transform.position.x + (float)direction * speed * Time.deltaTime;
+        targetX = Mathf.Clamp(targetX, -limitX, limitX);
+
+        transform.position = new Vector3(targetX, transform.position.y, 0);
+    }
+
+    /// <summary>
+    /// 可视宽度的一半 - 自身半宽 - 余量：窗口变窄时边界自动收紧，
+    /// 保证挡板永远不出画面。
+    /// </summary>
+    private float CurrentLimitX()
+    {
+        float halfViewWidth = _cam.orthographicSize * _cam.aspect;
+        return Mathf.Max(0.5F, halfViewWidth - _halfWidth - edgePadding);
     }
 
     Direction? GetDirection()
