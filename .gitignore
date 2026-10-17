@@ -1,0 +1,53 @@
+# ============================================================
+#  Unity
+# ============================================================
+
+# 编辑器生成的缓存目录（本项目 Library 就占 1.5 GB）
+[Ll]ibrary/
+[Tt]emp/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Bb]uild/
+[Bb]uilds/
+
+# Unity 自动生成的工程文件（编辑器会按本机环境重建）
+*.csproj
+*.sln
+*.unityproj
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.mdb
+*.opendb
+*.VC.db
+
+# 崩溃/诊断
+sysinfo.txt
+crashlytics-build.properties
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# ============================================================
+#  IDE / 编辑器
+# ============================================================
+
+.vs/
+.idea/
+**/.obsidian/
+*.DotSettings.user
+*.sln.DotSettings.user
+
+# ============================================================
+#  系统 / 临时
+# ============================================================
+
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.tmp
+*.log
