@@ -37,6 +37,43 @@
 | 生成高度 | y = 6.5 |
 | 判定"漏掉"的高度 | y < -6.5 |
 
+### 下落速度与难度曲线
+
+掉落物用 `Rigidbody2D` 的重力下落，速度由 **`Gravity Scale`** 控制（项目物理重力默认 `-9.81`）。
+
+| 阶段 | Gravity Scale | 实际加速度 | 从 y=6.5 落到 y=-6.5（13 单位）约需 |
+| --- | --- | --- | --- |
+| 开局 | **0.7** | 6.87 单位/秒² | ≈ 1.95 秒 |
+| 中期 | 1.55 | 15.2 单位/秒² | ≈ 1.3 秒 |
+| 后期（60 秒后） | **2.4** | 23.5 单位/秒² | ≈ 1.05 秒 |
+
+难度曲线在 `Spawner` 里算：
+
+```csharp
+float difficulty = Mathf.Clamp01(_elapsed / rampSeconds);              // 60 秒到顶
+float interval = Mathf.Lerp(startInterval, minInterval, difficulty);   // 1.0 → 0.32 秒
+rb.gravityScale = Mathf.Lerp(0.7f, 2.4f, difficulty);                  // 下落加速
+```
+
+| 参数 | 值 | 作用 |
+| --- | --- | --- |
+| `startInterval` | 1.0 秒 | 开局生成间隔 |
+| `minInterval` | 0.32 秒 | 最快生成间隔 |
+| `rampSeconds` | 60 秒 | 多久达到最难 |
+| 起始 `gravityScale` | 0.7 | 开局下落速度 |
+| 最快 `gravityScale` | 2.4 | 后期下落速度 |
+
+**想调手感时改哪里**：
+
+| 想要的效果 | 改哪里 |
+| --- | --- |
+| 整体变慢 / 变快 | 把两个 `gravityScale` 同比例缩放（比如都 ×0.8） |
+| 难度爬升更平缓 | 增大 `rampSeconds`（60 → 120） |
+| 方块更密集 | 减小 `minInterval` |
+| 屏幕太满、来不及反应 | 减小 `rangeX` 或加大 `minInterval` |
+
+> **重要**：`gravityScale` 会在**每次生成后由 `Spawner` 覆盖**。所以改 Prefab 上 `Rigidbody 2D` 的 `Gravity Scale` 是不生效的——要改 `Spawner` 里的 `Mathf.Lerp(0.7f, 2.4f, difficulty)` 这两个值。
+
 ## 4. 场景结构
 
 ```
