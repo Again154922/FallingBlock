@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour
 
     public void OnRestart()
     {
+        Debug.Log("[GameManager] OnRestart");
         for (int i = 0; i < spawner.transform.childCount; i++)
         {
             Destroy(spawner.transform.GetChild(i).gameObject);
